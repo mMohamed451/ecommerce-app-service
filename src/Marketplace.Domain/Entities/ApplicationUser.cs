@@ -21,4 +21,5 @@ public class ApplicationUser : IdentityUser<Guid>, IAuditable
     public virtual UserProfile? Profile { get; set; }
     public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
     public virtual NotificationPreference? NotificationPreference { get; set; }
+    public virtual Vendor? Vendor { get; set; }
 }

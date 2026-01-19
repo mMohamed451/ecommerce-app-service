@@ -9,6 +9,19 @@ public interface IApplicationDbContext
     DbSet<UserProfile> UserProfiles { get; }
     DbSet<Address> Addresses { get; }
     DbSet<NotificationPreference> NotificationPreferences { get; }
+    DbSet<Vendor> Vendors { get; }
+    DbSet<VendorVerification> VendorVerifications { get; }
+    DbSet<VendorBankAccount> VendorBankAccounts { get; }
+    DbSet<VendorCommission> VendorCommissions { get; }
+    DbSet<VendorSubscription> VendorSubscriptions { get; }
+    DbSet<VendorLocation> VendorLocations { get; }
+    DbSet<VendorBusinessHours> VendorBusinessHours { get; }
+    DbSet<VendorShippingSettings> VendorShippingSettings { get; }
+    DbSet<VendorTaxInfo> VendorTaxInfos { get; }
+    DbSet<VendorApiKey> VendorApiKeys { get; }
+    DbSet<VendorActivityLog> VendorActivityLogs { get; }
+    DbSet<VendorNotificationPreference> VendorNotificationPreferences { get; }
+    DbSet<VendorPerformanceMetrics> VendorPerformanceMetrics { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
