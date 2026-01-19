@@ -2,6 +2,7 @@ using Marketplace.Application.Features.Category.Commands.CreateCategory;
 using Marketplace.Application.Features.Category.Commands.UpdateCategory;
 using Marketplace.Application.Features.Category.Commands.DeleteCategory;
 using Marketplace.Application.Features.Category.Queries.GetCategories;
+using Marketplace.Application.Features.Category.Queries.GetCategoryTree;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,13 @@ public class CategoryController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> GetCategories([FromQuery] GetCategoriesQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet("tree")]
+    public async Task<IActionResult> GetCategoryTree([FromQuery] GetCategoryTreeQuery query)
     {
         var result = await _mediator.Send(query);
         return Ok(result);

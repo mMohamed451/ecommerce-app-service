@@ -1,3 +1,4 @@
+using Marketplace.Application.Common.Interfaces;
 using Marketplace.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,16 @@ public class SeedController : ControllerBase
 {
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IApplicationDbContext _context;
 
     public SeedController(
         RoleManager<IdentityRole<Guid>> roleManager,
-        UserManager<ApplicationUser> userManager)
+        UserManager<ApplicationUser> userManager,
+        IApplicationDbContext context)
     {
         _roleManager = roleManager;
         _userManager = userManager;
+        _context = context;
     }
 
     [HttpPost("admin")]
@@ -89,6 +93,26 @@ public class SeedController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("categories-and-products")]
+    public async Task<IActionResult> SeedCategoriesAndProducts()
+    {
+        try
+        {
+            await SeedData.SeedCategoriesAsync(_context);
+            await SeedData.SeedProductsAsync(_context, _userManager);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Categories and products seeded successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { success = false, message = ex.Message });
         }
     }
 }

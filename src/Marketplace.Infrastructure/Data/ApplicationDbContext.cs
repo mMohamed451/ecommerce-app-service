@@ -39,6 +39,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<ProductAttribute> ProductAttributes => Set<ProductAttribute>();
     public DbSet<ProductVariationAttribute> ProductVariationAttributes => Set<ProductVariationAttribute>();
 
+    // Cart and Wishlist
+    public DbSet<Cart> Carts => Set<Cart>();
+    public DbSet<CartItem> CartItems => Set<CartItem>();
+    public DbSet<Wishlist> Wishlists => Set<Wishlist>();
+    public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
+
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         // Update audit fields
@@ -340,6 +346,69 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasOne(e => e.ProductVariation)
                 .WithMany(v => v.VariationAttributes)
                 .HasForeignKey(e => e.ProductVariationId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure Cart
+        builder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.SessionId);
+            entity.HasIndex(e => new { e.UserId, e.IsActive });
+            entity.HasIndex(e => new { e.SessionId, e.IsActive });
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure CartItem
+        builder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.CartId);
+            entity.HasIndex(e => new { e.ProductId, e.ProductVariationId });
+            entity.HasOne(e => e.Cart)
+                .WithMany(c => c.Items)
+                .HasForeignKey(e => e.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ProductVariation)
+                .WithMany()
+                .HasForeignKey(e => e.ProductVariationId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure Wishlist
+        builder.Entity<Wishlist>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.SessionId);
+            entity.HasIndex(e => new { e.UserId, e.IsActive });
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure WishlistItem
+        builder.Entity<WishlistItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.WishlistId);
+            entity.HasIndex(e => new { e.WishlistId, e.ProductId }).IsUnique();
+            entity.HasOne(e => e.Wishlist)
+                .WithMany(w => w.Items)
+                .HasForeignKey(e => e.WishlistId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

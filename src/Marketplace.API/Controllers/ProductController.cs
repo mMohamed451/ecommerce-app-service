@@ -5,9 +5,13 @@ using Marketplace.Application.Features.Product.Commands.UploadProductImage;
 using Marketplace.Application.Features.Product.Commands.UpdateInventory;
 using Marketplace.Application.Features.Product.Commands.ExportProducts;
 using Marketplace.Application.Features.Product.Commands.ImportProducts;
+using Marketplace.Application.Features.Product.Commands.TrackProductView;
 using Marketplace.Application.Features.Product.Queries.GetProduct;
 using Marketplace.Application.Features.Product.Queries.GetProductBySlug;
 using Marketplace.Application.Features.Product.Queries.GetProducts;
+using Marketplace.Application.Features.Product.Queries.GetAutocompleteSuggestions;
+using Marketplace.Application.Features.Product.Queries.GetTrendingProducts;
+using Marketplace.Application.Features.Product.Queries.GetRecommendedProducts;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -193,6 +197,56 @@ public class ProductController : ControllerBase
         // Dispose the stream after command execution
         await command.FileStream.DisposeAsync();
         
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet("search/autocomplete")]
+    public async Task<IActionResult> GetAutocompleteSuggestions([FromQuery] GetAutocompleteSuggestionsQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet("trending")]
+    public async Task<IActionResult> GetTrendingProducts([FromQuery] GetTrendingProductsQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpGet("recommendations")]
+    public async Task<IActionResult> GetRecommendedProducts([FromQuery] GetRecommendedProductsQuery query)
+    {
+        var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/view")]
+    public async Task<IActionResult> TrackProductView(
+        Guid id,
+        [FromQuery] string? userId = null,
+        [FromQuery] string? sessionId = null,
+        [FromQuery] string? ipAddress = null,
+        [FromQuery] string? userAgent = null,
+        [FromQuery] string? referrer = null)
+    {
+        var command = new TrackProductViewCommand
+        {
+            ProductId = id,
+            UserId = userId,
+            SessionId = sessionId,
+            IpAddress = ipAddress,
+            UserAgent = userAgent,
+            Referrer = referrer
+        };
+
+        var result = await _mediator.Send(command);
+
         if (!result.IsSuccess)
         {
             return BadRequest(result);

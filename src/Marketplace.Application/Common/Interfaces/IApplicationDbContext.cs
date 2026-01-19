@@ -28,6 +28,12 @@ public interface IApplicationDbContext
     DbSet<ProductVariation> ProductVariations { get; }
     DbSet<ProductAttribute> ProductAttributes { get; }
     DbSet<ProductVariationAttribute> ProductVariationAttributes { get; }
-    
+
+    // Cart and Wishlist
+    DbSet<Cart> Carts { get; }
+    DbSet<CartItem> CartItems { get; }
+    DbSet<Wishlist> Wishlists { get; }
+    DbSet<WishlistItem> WishlistItems { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
