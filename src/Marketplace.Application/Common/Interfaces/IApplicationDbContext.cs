@@ -22,6 +22,12 @@ public interface IApplicationDbContext
     DbSet<VendorActivityLog> VendorActivityLogs { get; }
     DbSet<VendorNotificationPreference> VendorNotificationPreferences { get; }
     DbSet<VendorPerformanceMetrics> VendorPerformanceMetrics { get; }
+    DbSet<Product> Products { get; }
+    DbSet<Category> Categories { get; }
+    DbSet<ProductImage> ProductImages { get; }
+    DbSet<ProductVariation> ProductVariations { get; }
+    DbSet<ProductAttribute> ProductAttributes { get; }
+    DbSet<ProductVariationAttribute> ProductVariationAttributes { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

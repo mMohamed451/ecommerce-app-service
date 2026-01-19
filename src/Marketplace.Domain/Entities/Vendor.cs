@@ -61,6 +61,7 @@ public class Vendor : BaseEntity, IAuditable
     public virtual ICollection<VendorActivityLog> ActivityLogs { get; set; } = new List<VendorActivityLog>();
     public virtual VendorNotificationPreference? NotificationPreference { get; set; }
     public virtual ICollection<VendorPerformanceMetrics> PerformanceMetrics { get; set; } = new List<VendorPerformanceMetrics>();
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
 
 public enum VerificationStatus

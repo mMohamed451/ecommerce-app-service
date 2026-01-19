@@ -32,6 +32,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<VendorActivityLog> VendorActivityLogs => Set<VendorActivityLog>();
     public DbSet<VendorNotificationPreference> VendorNotificationPreferences => Set<VendorNotificationPreference>();
     public DbSet<VendorPerformanceMetrics> VendorPerformanceMetrics => Set<VendorPerformanceMetrics>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ProductVariation> ProductVariations => Set<ProductVariation>();
+    public DbSet<ProductAttribute> ProductAttributes => Set<ProductAttribute>();
+    public DbSet<ProductVariationAttribute> ProductVariationAttributes => Set<ProductVariationAttribute>();
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
@@ -255,6 +261,85 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             entity.HasOne(e => e.Vendor)
                 .WithMany(v => v.PerformanceMetrics)
                 .HasForeignKey(e => e.VendorId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure Product
+        builder.Entity<Product>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.VendorId);
+            entity.HasIndex(e => e.CategoryId);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => e.SKU);
+            entity.HasIndex(e => new { e.Status, e.IsActive });
+            entity.HasOne(e => e.Vendor)
+                .WithMany(v => v.Products)
+                .HasForeignKey(e => e.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure Category
+        builder.Entity<Category>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ParentId);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => new { e.IsActive, e.DisplayOrder });
+            entity.HasOne(e => e.Parent)
+                .WithMany(c => c.Children)
+                .HasForeignKey(e => e.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure ProductImage
+        builder.Entity<ProductImage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => new { e.ProductId, e.DisplayOrder });
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Images)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure ProductVariation
+        builder.Entity<ProductVariation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => e.SKU);
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Variations)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure ProductAttribute
+        builder.Entity<ProductAttribute>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductId);
+            entity.HasIndex(e => new { e.ProductId, e.DisplayOrder });
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Attributes)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure ProductVariationAttribute
+        builder.Entity<ProductVariationAttribute>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.ProductVariationId);
+            entity.HasOne(e => e.ProductVariation)
+                .WithMany(v => v.VariationAttributes)
+                .HasForeignKey(e => e.ProductVariationId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

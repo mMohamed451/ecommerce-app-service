@@ -61,6 +61,9 @@ public static class ConfigureServices
         
         // Add File Storage Service
         services.AddScoped<Application.Common.Interfaces.IFileStorageService, FileStorageService>();
+        
+        // Add Search Index Service (placeholder - implement with Elasticsearch/Azure Cognitive Search)
+        services.AddScoped<Application.Common.Interfaces.ISearchIndexService, SearchIndexService>();
 
         return services;
     }
